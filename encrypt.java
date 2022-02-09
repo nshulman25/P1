@@ -311,7 +311,7 @@ public class encrypt{
 
                     int decimal = Integer.parseInt(binary, 2);
                     hex = String.format("%x", decimal);
-                    h
+                    
                     input[row][column] = hex;
                 // if even convert back to hex and input in array
                 }else{
