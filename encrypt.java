@@ -1,7 +1,6 @@
 import java.io.*;
-import java.util.Arrays;
 import java.util.Scanner;
-//
+
 public class encrypt{
     static String key = null;
     static String initial_input = null;
@@ -16,9 +15,10 @@ public class encrypt{
         String encryption = vignereCipher(cleaned_input, key);
         writeFile("Subsitution: \n" + encryption + "\n \n", true);
 
-        String padded_Input[][] = padding(encryption);
-        String shift_Row[][] = shiftRows(padded_Input);
-        String parity_Bit[][] = parityBit(shift_Row);
+        String padded_Input[][][] = padding(encryption);
+        String shift_Row[][][] = shiftRows(padded_Input);
+        String parity_Bit[][][] = parityBit(shift_Row);
+        shiftColumn(parity_Bit);
     }
 
     /**
@@ -123,7 +123,7 @@ public class encrypt{
      * @return
      * @throws IOException
      */
-    private static String[][] padding(String input) throws IOException{
+    private static String[][][] padding(String input) throws IOException{
         
         // padds the string with 'A' to have a length divisible by 16
         int padding = 16 - (input.length() %16);
@@ -131,30 +131,26 @@ public class encrypt{
             input += 'A';
         }
         
-        // creates a 2D array wiith 4 columns and (string length/4) rows
-        String[][] padded_input = new String [input.length()/4][4];
+        // creates a 3D array wiith 4 columns 4 rows and dynamicly creates boxs
+        String[][][] padded_input = new String [input.length()/16][4][4];
         int pointer = 0;
 
         writeFile("Padding:" + "\n", true);
 
-        // loops through the 2d array (rows, right to left; then down one column)
-        for(int row = 0; row < padded_input.length; row++){
-            for(int column = 0; column < padded_input[row].length; column++){
-                
-                // adds character in the string at the pointer location to the array
-                char temp = input.charAt(pointer);
+        // loops through the 3d array (rows, right to left; then down one column)
+        for(int box = 0; box < padded_input.length; box++){
+            for(int row = 0; row < padded_input[box].length; row++){
+                for(int column = 0; column < padded_input[box][row].length; column++){
+                    // adds character in the string at the pointer location to the array
+                    char temp = input.charAt(pointer);
 
-                padded_input[row][column] = Character.toString(temp);
-                pointer++;
-                writeFile(padded_input[row][column], true);
-
-            }
-            writeFile("\n", true);
-            
-            // if pointer is divisible by 16 creates a new line to make 4x4 block seperate
-            if(pointer%16 == 0){
+                    padded_input[box][row][column] = Character.toString(temp);
+                    pointer++;
+                    writeFile(padded_input[box][row][column], true);
+                }
                 writeFile("\n", true);
             }
+            writeFile("\n", true);            
         }
         return padded_input;
     } 
@@ -165,100 +161,96 @@ public class encrypt{
      * @return an array of string
      * @throws IOException
      */
-    private static String[][] shiftRows(String[][] input) throws IOException{
+    private static String[][][] shiftRows(String[][][] input) throws IOException{
         
         writeFile("ShiftRows:" + "\n", true);
-        
-        // Counter to determine row number(0-3)
-        int counter = 0;
-       
-        // Creates a temporary copy of the 2d array
-        String[][] temp = new String[input.length][];
-        for(int row = 0; row < input.length; row++){
-            temp[row] = new String[input[row].length];
 
-            for(int column = 0; column < input[row].length; column++){
-                temp[row][column] = input[row][column];
+        // Creates a temporary copy of the 3d array
+        String[][][] temp = new String[input.length][][];
+
+        for(int box = 0; box < temp.length; box++){
+            temp[box] = new String[input[box].length][];
+
+            for(int row = 0; row < temp[box].length; row++){
+                temp[box][row] = new String[input[row].length];
+
+                for(int column = 0; column < temp[box][row].length; column++){
+                    temp[box][row][column] = input[box][row][column];
+
+                }
             }
         }
 
 
-
-        // loops through the 2d array (rows, right to left; then down one column)
-        for(int row = 0; row < input.length; row++){
-            for(int column = 0; column < input[row].length; column++){
-               
-                // 2nd row shift
-                // Shifts all characters 1 to the left in the row and wraps around
-                if(counter == 1 ){
-                    
-                    if(column == 3){
-                        input[row][column] = temp[row][0];
-                        writeFile(input[row][column], true);
-                        break;
-                    }
-
-                    input[row][column] = input[row][column+1];
-                    writeFile(input[row][column], true);
-                }
+        // loops through the 3d array (rows, right to left; then down one column)
+        for(int box = 0; box < input.length; box++){
+            for(int row = 0; row < input[box].length; row++){
+                for(int column = 0; column < input[box][row].length; column++){
                 
-                // 3rd row shift
-                // Shifts all characters 2 to the left in the row and wraps around
-                else if(counter == 2){
-                    
-                    if(column == 2){
-                        input[row][column] = temp[row][0];
-                        writeFile(input[row][column], true);
-                        continue;
+                    // 2nd row shift
+                    // Shifts all characters 1 to the left in the row and wraps around
+                    if(row == 1 ){
+                        
+                        if(column == 3){
+                            input[box][row][column] = temp[box][row][0];
+                            writeFile(input[box][row][column], true);
+                            break;
+                        }
+
+                        input[box][row][column] = input[box][row][column+1];
+                        writeFile(input[box][row][column], true);
                     }
-                    if(column == 3){
-                        input[row][column] = temp[row][1];
-                        writeFile(input[row][column], true);
-                        continue;
-                    }
+
+                    // 3rd row shift
+                    // Shifts all characters 2 to the left in the row and wraps around
+                    else if(row == 2){
                     
-                    input[row][column] = input[row][column+2];
-                    writeFile(input[row][column], true);
+                        if(column == 2){
+                            input[box][row][column] = temp[box][row][0];
+                            writeFile(input[box][row][column], true);
+                            continue;
+                        }
+                        if(column == 3){
+                            input[box][row][column] = temp[box][row][1];
+                            writeFile(input[box][row][column], true);
+                            continue;
+                        }
+                    
+                        input[box][row][column] = input[box][row][column+2];
+                        writeFile(input[box][row][column], true);
+                    }
+                    // 4th row shift
+                    // Shifts all characters 3 to the left in the row and wraps around
+                    else if(row == 3){
+                    
+                        if(column == 1){
+                            input[box][row][column] = temp[box][row][0];
+                            writeFile(input[box][row][column], true);
+                            continue;
+                        }
+                        if(column == 2){
+                            input[box][row][column] = temp[box][row][1];
+                            writeFile(input[box][row][column], true);
+                            continue;
+                        }
+                        if(column == 3){
+                            input[box][row][column] = temp[box][row][2];
+                            writeFile(input[box][row][column] + "\n", true);
+                            continue;
+                        }
+                        
+                        input[box][row][column] = input[box][row][column+3];
+                        writeFile(input[box][row][column], true);
+                    
+                    // 1st row shift
+                    // Keeps rows the same     
+                    }else{
+                        writeFile(input[box][row][column], true);
+                    }
                 }
-
-                // 4th row shift
-                // Shifts all characters 3 to the left in the row and wraps around
-                else if(counter ==3){
-                   
-                    if(column == 1){
-                        input[row][column] = temp[row][0];
-                        writeFile(input[row][column], true);
-                        continue;
-                    }
-                    if(column == 2){
-                        input[row][column] = temp[row][1];
-                        writeFile(input[row][column], true);
-                        continue;
-                    }
-                    if(column == 3){
-                        input[row][column] = temp[row][2];
-                        writeFile(input[row][column] + "\n", true);
-                        continue;
-                    }
-                    
-                    input[row][column] = input[row][column+3];
-                    writeFile(input[row][column], true);
-                
-                // 1st row shift
-                // Keeps rows the same     
-                }else{
-                    writeFile(input[row][column], true);
-                }
-
-            }
-            writeFile("\n", true);
-            counter++;
-
-            if (counter > 3){
-                counter = 0;
+                writeFile("\n", true);
             }
         }
- 
         return input;
     }
     
@@ -280,55 +272,55 @@ public class encrypt{
     }
 
     /**
-     * loops through a 2d array and if the strings value converted to a binary nummber 
+     * loops through a 3d array and if the strings value converted to a binary nummber 
      * has an odd number of 1s adds a parity bit
      * @param input
-     * @return 2d array of hexidecimal numbers as strings
+     * @return 3d array of hexidecimal numbers as strings
      * @throws IOException
      */
-    private static String[][] parityBit(String[][] input) throws IOException{
+    private static String[][][] parityBit(String[][][] input) throws IOException{
         writeFile("Parity: " + "\n", true);        
-        int pointer = 0;
 
            // loops through the 2d array (rows, right to left; then down one column)
-           for(int row = 0; row < input.length; row++){
-            for(int column = 0; column < input[row].length; column++){
+           for(int box = 0; box < input.length; box++){
+            for(int row = 0; row < input[box].length; row++){
+                for(int column = 0; column < input[box][row].length; column++){
+                    String hex = null;
                 
-                String hex = null;
-                
-                // Converts the current value to its decimal representation
-                char c = input[row][column].charAt(0);
-                int n = (int) c;
-                
-                // if odd number of 1s add parity bit and convert to hex and add back to array
-                if(parityBitFunction(n) == true){
+                    // Converts the current value to its decimal representation
+                    char c = input[box][row][column].charAt(0);
+                    int n = (int) c;
                     
-                    hex = String.format("%x", n);
-                    int num = Integer.parseInt(hex, 16);
-                    String binary = Integer.toString(num, 2);
-                    
-                    binary = 1 + binary;
+                    // if odd number of 1s add parity bit and convert to hex and add back to array
+                    if(parityBitFunction(n) == true){
+                        
+                        hex = String.format("%x", n);
+                        int num = Integer.parseInt(hex, 16);
+                        String binary = Integer.toString(num, 2);
+                        
+                        binary = 1 + binary;
 
-                    int decimal = Integer.parseInt(binary, 2);
-                    hex = String.format("%x", decimal);
-                    
-                    input[row][column] = hex;
-                // if even convert back to hex and input in array
-                }else{
-                    hex = String.format("%x", (int) n);
-                    input[row][column] = hex;
-                } 
-
-                writeFile(input[row][column] + " ", true);
-                pointer++;
-
-            }
-            writeFile("\n", true); 
-            if(pointer%16 == 0){
-                writeFile("\n", true);
-            }       
+                        int decimal = Integer.parseInt(binary, 2);
+                        hex = String.format("%x", decimal);
+                        
+                        input[box][row][column] = hex;
+                    // if even convert back to hex and input in array
+                    }else{
+                        hex = String.format("%x", (int) n);
+                        input[box][row][column] = hex;
+                    } 
+                    writeFile(input[box][row][column] + " ", true);
+                }  
+                writeFile("\n", true); 
+            }    
+            writeFile("\n", true);
         }
-
         return input;
+    }
+
+    private static String[][][] shiftColumn(String[][][] input) throws IOException{
+        writeFile("Shift Columns: \n", true);
+
+        return null;
     }
 }

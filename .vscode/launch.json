@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch encrypt",
+            "request": "launch",
+            "mainClass": "encrypt",
+            "projectName": "P1_829056b2"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
