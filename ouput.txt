@@ -25,3 +25,45 @@ AAAA
 AAAA
 AAAA
 
+ShiftRows:
+WVOG
+TXQJ
+HXHU
+YICW
+
+YMGH
+RKQT
+PWHQ
+GKYV
+
+LPYS
+WGOP
+TOIN
+MFOP
+
+OAAA
+AAAA
+AAAA
+AAAA
+
+Parity: 
+d7 56 cf 47 
+d4 d8 d1 ca 
+48 d8 48 55 
+59 c9 c3 d7 
+
+59 4d 47 48 
+d2 4b d1 d4 
+50 d7 48 d1 
+47 4b 59 56 
+
+cc 50 59 53 
+d7 47 cf 50 
+d4 cf c9 4e 
+4d c6 cf 50 
+
+cf 41 41 41 
+41 41 41 41 
+41 41 41 41 
+41 41 41 41 
+
