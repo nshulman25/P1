@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
-
+//
 public class encrypt{
     static String key = null;
     static String initial_input = null;
